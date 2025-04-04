@@ -23,7 +23,6 @@ Sistema completo para la gestión de bibliotecas universitarias con:
 
 ## Estructura del Proyecto
 
-```text
 biblioteca-universitaria/
 ├── interfaz/
 │   ├── conexion_sqlserver/
@@ -49,7 +48,8 @@ biblioteca-universitaria/
 ├── views/
 │   └── vista.sql/
 
-## Roles y Permisos
+## Roles y Permisos:
+
 El sistema implementa tres roles con distintos niveles de acceso:
 
 1. DBA (Administrador):
