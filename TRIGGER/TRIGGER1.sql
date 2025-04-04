@@ -12,10 +12,9 @@ BEGIN
         FROM prestamo p
         INNER JOIN inserted i ON p.usuario_id = i.usuario_id
         WHERE p.estado = 'Activo'
-        AND p.fecha_limite_devolucion < GETDATE()
     )
     BEGIN
-		RAISERROR('El usuario tiene préstamos activos y no puede solicitar un nuevo préstamo',16,1)
+		RAISERROR('El usuario tiene prÃ©stamos activos y no puede solicitar un nuevo prÃ©stamo',16,1)
 	END
     ELSE
     BEGIN

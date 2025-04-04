@@ -22,3 +22,8 @@ BEGIN
     FROM libro l
     INNER JOIN inserted i ON l.libro_id = i.libro_id;
 END;
+
+SELECT * FROM detalle_prestamo
+SELECT * FROM libro
+
+INSERT INTO detalle_prestamo  (prestamo_id,libro_id,cantidad) VALUES (1,4,2)
