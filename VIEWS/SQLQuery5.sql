@@ -18,3 +18,10 @@ inner join tipo_texto as tp
 on l.tipo_texto_id = tp.tipo_texto_id
 group by l.libro_id, l.titulo , c.nombre_categoria , tp.nombre_tipo ,l.editorial
 order by prestamos desc
+
+
+select *
+from Libros_disponibles
+
+select *
+from Libros_mas_prestados

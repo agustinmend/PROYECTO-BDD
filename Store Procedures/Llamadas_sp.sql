@@ -12,6 +12,20 @@ EXEC Registrar_Libro
 EXEC Reporte_Mes @fecha = '2024-05-15';
 exec Historial_pedidos_cliente @clienteid = 7
 
+--pruebas
+EXEC Registrar_Libro 
+    @titulo = 'Romano',
+    @anio_publicacion = 2023,
+    @editorial = 'Editorial CBA',
+    @tipo_texto_id = 1,
+    @categoria_id = 2, 
+    @copias_totales = 5,
+    @nombre_autor = 'Lucas',
+    @apellido_autor = 'Montero';
+
+EXEC Reporte_Mes @fecha = '2024-02-15';
+exec Historial_pedidos_cliente @clienteid = 2
+
 select *
 from prestamo
 
