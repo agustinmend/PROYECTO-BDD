@@ -1,13 +1,9 @@
-import mysql.connector
 import pyodbc
 from dataclasses import dataclass
-from extraccion_datos import obtener_tablas,extraer_columnas,extraer_numero_registros,extraer_info
 from conexion import Conexiones
 
 conexion_db=Conexiones()
-conexion_db.conectar_mysql()
 conexion_db.conectar_sqlserver()
-mycursor=conexion_db.mydb.cursor()
 cursor_server=conexion_db.serverdb.cursor()
 @dataclass
 class Pruebas:
