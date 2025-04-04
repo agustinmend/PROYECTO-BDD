@@ -39,7 +39,7 @@ class Conexiones:
 
     # Establece la conexión con SQL Server
     def conectar_sqlserver(self):
-        server = 'DESKTOP-T8BJL71'  # Cambia según corresponda
+        server = 'AGUSTIN'  # Cambia según corresponda
         database = 'BibliotecaUniversitaria'
         username = 'DESKTOP-T8BJL71\\user'  # Cambia según corresponda
 
