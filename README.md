@@ -24,29 +24,53 @@ Sistema completo para la gestión de bibliotecas universitarias con:
 ## Estructura del Proyecto
 
 biblioteca-universitaria/
+
 ├── interfaz/
+
 │   ├── conexion_sqlserver/
+
 │   │   └── conexion.py
+
 │   ├── interfaz/
+
 │   │   ├── autenticacion.py
+
 │   │   └── biblioteca_app.py
+
 │   └── main.py
+
 ├── indices/
+
 │   ├── indices.sql/
+
 ├── roles/
+
 │   ├── RolesAsignados.sql/
+
 ├── stored_procedure/
+
 │   └── Historial_pedidos_clientes.sql/
+
 │   └── Llamadas_sp.sql/
+
 │   └── Registrar_Libros.sql/
+
 │   └── Reporte_Mes.sql/
+
 ├── trigger/
+
 │   └── trigger1.sql/
+
 │   └── trigger2.sql/
+
 │   └── trigger3.sql/
+
 │   └── trigger4.sql/
+
 ├── views/
+
 │   └── vista.sql/
+
 
 ## Roles y Permisos:
 
