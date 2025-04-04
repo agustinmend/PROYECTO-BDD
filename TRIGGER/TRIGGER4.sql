@@ -21,8 +21,11 @@ BEGIN
 END;
 
 select * from prestamo
+SELECT * FROM detalle_prestamo
 select * from libro
 update prestamo
-set estado = 'Devuelto'
-where prestamo_id = 7
+set estado = 'Devuelto',
+fecha_devolucion = GETDATE()
+where prestamo_id = 13
+
 select * from libro
