@@ -6,7 +6,7 @@ import sys
 import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'sqlserver_to_mysql')))
-from DEFENSA_EXAMEN import add_registro_defensa
+from sqlserver_to_mysql.DEFENSA_EXAMEN import add_registro_defensa
 
 # Clase Principal de la Aplicación de Gestión de Biblioteca
 class BibliotecaApp:

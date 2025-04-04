@@ -5,8 +5,8 @@ import os
 
 # Configurar el acceso al módulo de migración
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'sqlserver_to_mysql')))
-from conexion import Conexiones
-from DEFENSA_EXAMEN import add_registro_defensa
+from sqlserver_to_mysql.conexion import Conexiones
+from sqlserver_to_mysql.DEFENSA_EXAMEN import add_registro_defensa
 def main():
     try:
         print("Iniciando migración de datos...")
