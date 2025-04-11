@@ -716,7 +716,7 @@ class BibliotecaApp:
             tk.Label(self.root, text="No hay libros disponibles.", font=("Arial", 11)).pack(pady=10)
         else:
             columnas = ["titulo", "nombre_categoria", "nombre_tipo", "editorial", "copias_totales"]
-            tree = tk.Treeview(self.root, columns=columnas, show='headings', height=15)
+            tree = ttk.Treeview(self.root, columns=columnas, show='headings', height=15)
             tree.pack(pady=10, padx=10)
             tree.heading("titulo", text="Título")
             tree.heading("nombre_categoria", text="Categoría")
@@ -759,7 +759,7 @@ class BibliotecaApp:
             tk.Button(self.root, text="Volver", command=self.create_main_menu, bg="#2196F3", fg="white", font=("Arial", 11)).pack(pady=20)
             return
         columnas = list(prestamos[0].keys())
-        tree = tk.Treeview(self.root, columns=columnas, show='headings', height=15)
+        tree = ttk.Treeview(self.root, columns=columnas, show='headings', height=15)
         tree.pack(pady=10)
         for col in columnas:
             tree.heading(col, text=col.replace("_", " ").capitalize())
@@ -797,13 +797,13 @@ class BibliotecaApp:
                 return
             libros = self.obtener_libros_por_autor(autor)
             for widget in self.root.pack_slaves():
-                if isinstance(widget, tk.Treeview):
+                if isinstance(widget, ttk.Treeview):
                     widget.destroy()
             if not libros:
                 tk.Label(self.root, text="No se encontraron libros para ese autor.", font=("Arial", 11)).pack(pady=10)
                 return
             columnas = list(libros[0].keys())
-            tree = tk.Treeview(self.root, columns=columnas, show='headings', height=15)
+            tree = ttk.Treeview(self.root, columns=columnas, show='headings', height=15)
             tree.pack(pady=10)
             for col in columnas:
                 tree.heading(col, text=col.replace("_", " ").capitalize())
@@ -867,7 +867,7 @@ class BibliotecaApp:
 
             columnas = list(prestamos[0].keys())
 
-            self.treeview = tk.Treeview(self.root, columns=columnas, show='headings', height=15)
+            self.treeview = ttk.Treeview(self.root, columns=columnas, show='headings', height=15)
             self.treeview.pack(pady=10)
 
             for col in columnas:
