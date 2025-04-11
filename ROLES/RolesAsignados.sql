@@ -26,7 +26,8 @@ GRANT SELECT, INSERT, UPDATE ON usuario TO usuario_vendedor;
 --dar permiso a vendedor para que ejecute sp
 GRANT EXECUTE ON dbo.ObtenerLibrosPorAutor TO usuario_vendedor;
 GRANT EXECUTE ON dbo.ObtenerPrestamosActivosPorNombre TO usuario_vendedor;
-	
+GRANT EXECUTE ON dbo.DevolverLibro TO usuario_vendedor;
+
 SELECT name FROM sys.server_principals WHERE type = 'S';	
 
 create view libros_mas_prestados as

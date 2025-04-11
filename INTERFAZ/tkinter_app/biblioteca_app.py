@@ -81,48 +81,6 @@ class BibliotecaApp:
                 command=lambda t=table_name, c=columns: self.create_action_interface(action, t, c, c[0])
             ).pack(pady=5)
 
-        ##bloque para anadir boton ver libros disponibles
-        tk.Button(
-            self.root,
-            text="📚 Ver Libros Disponibles",
-            width=30,
-            bg="#2196F3",
-            fg="white",
-            font=("Arial", 11),
-            command=self.mostrar_libros_disponibles
-        ).pack(pady=10)
-        ##bloque para ver prestamos activos
-        tk.Button(
-            self.root,
-            text="📄 Ver Préstamos Activos",
-            width=30,
-            bg="#009688",
-            fg="white",
-            font=("Arial", 11),
-            command=self.mostrar_prestamos_activos
-        ).pack(pady=10)
-        ##bloque para libros por autor
-        tk.Button(
-            self.root,
-            text="🔎 Buscar libros por autor",
-            width=30,
-            bg="#673AB7",
-            fg="white",
-            font=("Arial", 11),
-            command=self.buscar_libros_por_autor
-        ).pack(pady=10)
-        ##bloque para devolver
-        tk.Button(
-            self.root,
-            text="🔁 Devolver libro por nombre",
-            width=30,
-            bg="#009688",
-            fg="white",
-            font=("Arial", 11),
-            command=self.buscar_y_devolver_por_nombre
-        ).pack(pady=10)
-
-
         back_button = tk.Button(self.root, text="Volver", command=self.create_main_menu)
         back_button.pack(pady=10)
 
@@ -181,7 +139,6 @@ class BibliotecaApp:
 
         actions = [
             ("📋 Visualizar Datos", 'visualizar'),
-            ("➕ Agregar Registros", 'agregar'),
             ("✏️ Editar Registros", 'modificar')
         ]
 
@@ -194,7 +151,49 @@ class BibliotecaApp:
                         font=("Arial", 11),
                         command=lambda a=action: self.create_table_menu(a))
             btn.pack(pady=5)
-        
+
+        ##bloque para anadir boton ver libros disponibles
+        tk.Button(
+            self.root,
+            text="📚 Ver Libros Disponibles",
+            width=30,
+            bg="#2196F3",
+            fg="white",
+            font=("Arial", 11),
+            command=self.mostrar_libros_disponibles
+        ).pack(pady=10)
+        ##bloque para ver prestamos activos
+        tk.Button(
+            self.root,
+            text="📄 Ver Préstamos Activos",
+            width=30,
+            bg="#009688",
+            fg="white",
+            font=("Arial", 11),
+            command=self.mostrar_prestamos_activos
+        ).pack(pady=10)
+        ##bloque para libros por autor
+        tk.Button(
+            self.root,
+            text="🔎 Buscar libros por autor",
+            width=30,
+            bg="#673AB7",
+            fg="white",
+            font=("Arial", 11),
+            command=self.buscar_libros_por_autor
+        ).pack(pady=10)
+        ##bloque para devolver
+        tk.Button(
+            self.root,
+            text="🔁 Devolver libro por nombre",
+            width=30,
+            bg="#009688",
+            fg="white",
+            font=("Arial", 11),
+            command=self.buscar_y_devolver_por_nombre
+        ).pack(pady=10)
+
+
         tk.Button(parent_frame,
                 text="🔒 Cerrar Sesión",
                 command=self.volver_al_login,
@@ -329,6 +328,7 @@ class BibliotecaApp:
         prestamos = self.obtener_prestamos_activos()
         if not prestamos:
             tk.Label(self.root, text="No hay préstamos activos.", font=("Arial", 11)).pack(pady=10)
+            tk.Button(self.root, text="Volver", command=self.create_main_menu).pack(pady=20)
             return
         columnas = list(prestamos[0].keys())
         tree = ttk.Treeview(self.root, columns=columnas, show='headings', height=15)
@@ -425,57 +425,63 @@ class BibliotecaApp:
 
             prestamos = self.obtener_prestamos_por_nombre(nombre)
 
-            # Eliminar resultados anteriores
-            for widget in self.root.pack_slaves():
-                if isinstance(widget, ttk.Treeview):
-                    widget.destroy()
+            # Eliminar Treeview anterior si existe
+            if hasattr(self, 'treeview') and self.treeview:
+                self.treeview.destroy()
+
+            # Eliminar botón de devolución anterior si existe
+            if hasattr(self, 'devolver_btn') and self.devolver_btn:
+                self.devolver_btn.destroy()
 
             if not prestamos:
                 tk.Label(self.root, text="No se encontraron préstamos activos para ese nombre.", font=("Arial", 11)).pack(pady=10)
+                self.treeview = None
+                self.devolver_btn = None
                 return
 
             columnas = list(prestamos[0].keys())
 
-            tree = ttk.Treeview(self.root, columns=columnas, show='headings', height=15)
-            tree.pack(pady=10)
+            self.treeview = ttk.Treeview(self.root, columns=columnas, show='headings', height=15)
+            self.treeview.pack(pady=10)
 
             for col in columnas:
-                tree.heading(col, text=col.replace("_", " ").capitalize())
-                tree.column(col, width=140)
+                self.treeview.heading(col, text=col.replace("_", " ").capitalize())
+                self.treeview.column(col, width=140)
 
             for p in prestamos:
-                tree.insert("", "end", values=[p[col] for col in columnas])
+                self.treeview.insert("", "end", values=[p[col] for col in columnas])
 
             def seleccionar_y_devolver():
-                selected_item = tree.focus()
+                selected_item = self.treeview.focus()
                 if not selected_item:
                     messagebox.showwarning("Atención", "Seleccioná un préstamo para devolver.")
                     return
 
-                datos = tree.item(selected_item)['values']
-                id_prestamo = datos[0]  # primer columna debe ser id_prestamo
+                datos = self.treeview.item(selected_item)['values']
+                id_prestamo = datos[0]
 
                 confirmar = messagebox.askyesno("Confirmar devolución", f"¿Devolver préstamo ID {id_prestamo}?")
                 if confirmar:
                     self.devolver_libro(id_prestamo)
-                    realizar_busqueda()  # Recargar tabla
+                    realizar_busqueda()
 
-            tk.Button(
+            self.devolver_btn = tk.Button(
                 self.root,
                 text="Devolver préstamo seleccionado",
                 command=seleccionar_y_devolver,
                 bg="#FF5722",
                 fg="white",
                 font=("Arial", 11)
-            ).pack(pady=10)
+            )
+            self.devolver_btn.pack(pady=10)
 
         tk.Button(self.root, text="Buscar", command=realizar_busqueda, bg="#4CAF50", fg="white", font=("Arial", 11)).pack(pady=10)
         tk.Button(self.root, text="Volver", command=self.create_main_menu).pack(pady=20)
-
+        
     def devolver_libro(self, id_prestamo):
         cursor = self.db_connection.serverdb.cursor()
         try:
-            cursor.execute("EXEC DevolverLibro ?", (id_prestamo,))  # <--- Acá actualizás el estado
+            cursor.execute("EXEC DevolverLibro ?", (id_prestamo,))
             self.db_connection.serverdb.commit()
             messagebox.showinfo("Éxito", "Libro devuelto correctamente.")
         except Exception as e:
