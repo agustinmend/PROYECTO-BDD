@@ -3,7 +3,7 @@
 --Create date:  03-04-25
 --Description:  REGISTRAR LIBRO
 --===========================================
-CREATE PROCEDURE Registrar_Libro
+ALTER PROCEDURE Registrar_Libro
     @titulo VARCHAR(255),
     @anio_publicacion INT,
     @editorial VARCHAR(255),

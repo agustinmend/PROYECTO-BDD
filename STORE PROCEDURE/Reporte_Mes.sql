@@ -3,7 +3,7 @@
 --Create date:  03-04-25
 --Description:  OBTENER REPORTE MES
 --===========================================
-ALTER PROCEDURE Reporte_Mes
+CREATE PROCEDURE Reporte_Mes
     @fecha DATE 
 AS
 BEGIN

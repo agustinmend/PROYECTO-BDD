@@ -6,14 +6,14 @@ def fetch_data(db_connection, tree, table_name):
     if not conn:
         messagebox.showerror("Error", "No hay conexión a la base de datos")
         return
-        
+
     cursor = conn.cursor()
     try:
         cursor.execute(f"SELECT * FROM {table_name}")
         rows = cursor.fetchall()
-        
+
         tree.delete(*tree.get_children())
-        
+
         for row in rows:
             formatted_row = []
             for value in row:
@@ -31,7 +31,7 @@ def add_data(db_connection, tree, table_name, columns, values):
     conn = db_connection.serverdb
     if not conn:
         return
-    
+
     if table_name == "prestamo":
         try:
             fecha_prestamo_index = columns.index("fecha_prestamo")
@@ -51,14 +51,14 @@ def add_data(db_connection, tree, table_name, columns, values):
         except ValueError:
             messagebox.showerror("Error", "Formato de fecha inválido. Use AAAA-MM-DD.")
             return
-    
+
     values = [value if value and str(value).strip() else None for value in values]
     cursor = conn.cursor()
     try:
         cursor.execute(f"""
-            SELECT COLUMN_NAME 
-            FROM INFORMATION_SCHEMA.COLUMNS 
-            WHERE TABLE_NAME = ? 
+            SELECT COLUMN_NAME
+            FROM INFORMATION_SCHEMA.COLUMNS
+            WHERE TABLE_NAME = ?
             AND COLUMN_NAME = 'fecha_modificacion'
         """, (table_name,))
         fecha_mod_exists = cursor.fetchone() is not None
@@ -81,15 +81,15 @@ def delete_data(db_connection, tree, table_name, id_column):
     if not selected_item:
         messagebox.showerror("Error", "Selecciona un registro para eliminar.")
         return
-        
+
     confirm = messagebox.askquestion("Confirmación", "¿Estás seguro que deseas eliminar el registro?", icon='warning')
     if confirm != 'yes':
         return
-        
+
     conn = db_connection.serverdb
     if not conn:
         return
-        
+
     cursor = conn.cursor()
     try:
         record_id = tree.item(selected_item)["values"][0]
@@ -105,7 +105,7 @@ def update_data(db_connection, tree, table_name, columns, values, record_id):
     conn = db_connection.serverdb
     if not conn:
         return
-    
+
     try:
         primary_key = f"{table_name}_id"
 
@@ -145,9 +145,9 @@ def update_data(db_connection, tree, table_name, columns, values, record_id):
         cursor = conn.cursor()
 
         cursor.execute(f"""
-            SELECT COLUMN_NAME 
-            FROM INFORMATION_SCHEMA.COLUMNS 
-            WHERE TABLE_NAME = ? 
+            SELECT COLUMN_NAME
+            FROM INFORMATION_SCHEMA.COLUMNS
+            WHERE TABLE_NAME = ?
             AND COLUMN_NAME = 'fecha_modificacion'
         """, (table_name,))
         fecha_mod_exists = cursor.fetchone() is not None
