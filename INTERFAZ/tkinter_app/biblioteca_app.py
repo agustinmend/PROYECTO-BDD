@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from datetime import datetime
 from funciones import fetch_data, add_data, delete_data, update_data
+from pol import Pol
 
 class BibliotecaApp:
     def __init__(self, root, db_connection):
@@ -9,6 +10,7 @@ class BibliotecaApp:
         self.root.title("Gestión de Biblioteca Universitaria")
         self.root.geometry("1000x700")
         self.db_connection = db_connection
+        self.pol = Pol()
         self.create_main_menu()
 
     def create_main_menu(self):
@@ -62,28 +64,59 @@ class BibliotecaApp:
                             command=action)
             btn.pack(pady=5)
 
+    ##esto en biblioteca_app dentro de la clase
+#BLOQUE MODIFICADO POR DARIANA
     def _create_gerente_interface(self, parent_frame):
-        tk.Label(parent_frame,
-                 text="REPORTES GERENCIALES",
-                 font=("Arial", 14, "bold"),
-                 fg="#1565C0").pack(pady=(0, 20))
+        tk.Label(parent_frame, 
+                text="REPORTES GERENCIALES",
+                font=("Arial", 14, "bold"),
+                fg="#1565C0").pack(pady=(0, 20))
 
         options = [
-            ("📊 Libros más prestados", self.generar_reporte_libros_mas_prestados),
-            ("📋 Tabla de Préstamos", lambda: self.mostrar_tabla_gerente('prestamo')),
-            ("📑 Detalle de Préstamos", lambda: self.mostrar_tabla_gerente('detalle_prestamo'))
+            ("📊 Libros más prestados", self.mostrar_reporte_libros_mas_prestados),
+            ("📋 Usuarios Activos", self.mostrar_reporte_usuarios_activos),
+            ("📒 Usuarios Con Mas Prestamos", self.mostrar_reporte_usuarios_mas_prestamos),
+            ("🗂️ Stock de Libros por Categoria", self.mostrar_reporte_categoria)
         ]
 
         for text, cmd in options:
             btn = tk.Button(parent_frame,
-                           text=text,
-                           width=25,
-                           bg="#2196F3",
-                           fg="white",
-                           font=("Arial", 11),
-                           command=cmd)
+                        text=text,
+                        width=25,
+                        bg="#2196F3",
+                        fg="white",
+                        font=("Arial", 11),
+                        command=cmd)
             btn.pack(pady=5)
+        
+        tk.Button(parent_frame,
+                text="🔒 Cerrar Sesión",
+                command=self.volver_al_login,
+                bg="#FF5722",
+                fg="white",
+                font=("Arial", 11),
+                width=25).pack(pady=10)
 
+    def mostrar_reporte_libros_mas_prestados(self):
+        cursor = self.pol.generar_reporte_libros_mas_prestados(self.db_connection)
+        if cursor:
+            self.pol.mostrar_resultados_reporte(self.root, cursor, "Libros más prestados", self.create_main_menu)
+
+    def mostrar_reporte_usuarios_activos(self):
+        cursor = self.pol.generar_reporte_usuarios_estado_activo(self.db_connection)
+        if cursor:
+            self.pol.mostrar_resultados_reporte(self.root, cursor, "Usuarios con estado activo", self.create_main_menu)
+
+    def mostrar_reporte_usuarios_mas_prestamos(self):
+        cursor = self.pol.generar_reporte_usuarios_con_mas_prestamos(self.db_connection)
+        if cursor:
+            self.pol.mostrar_resultados_reporte(self.root, cursor, "Usuarios con mas prestamos", self.create_main_menu)
+
+    def mostrar_reporte_categoria(self):
+        cursor = self.pol.generar_reporte_categorias(self.db_connection)
+        if cursor:
+            self.pol.mostrar_resultados_reporte(self.root, cursor, "Cantidad de Libros por categoria", self.create_main_menu)
+##FIN DE BLOQUE MODIFICADO >;)
     def mostrar_tabla_gerente(self, table_name):
         for widget in self.root.winfo_children():
             widget.destroy()
@@ -580,88 +613,6 @@ class BibliotecaApp:
                            font=("Arial", 11),
                            command=lambda a=action: self.create_table_menu(a))
             btn.pack(pady=5)
-
-    def generar_reporte_libros_mas_prestados(self):
-        try:
-            cursor = self.db_connection.serverdb.cursor()
-
-            cursor.execute("""
-                SELECT TOP 10
-                    l.libro_id,
-                    l.titulo,
-                    c.nombre_categoria,
-                    COUNT(*) as total_prestamos
-                FROM libro l
-                JOIN detalle_prestamo dp ON l.libro_id = dp.libro_id
-                JOIN categoria c ON l.categoria_id = c.categoria_id
-                GROUP BY l.libro_id, l.titulo, c.nombre_categoria
-                ORDER BY total_prestamos DESC
-            """)
-            self.mostrar_resultados_reporte(cursor, "Libros más prestados")
-
-        except Exception as e:
-            error_msg = f"No se pudo generar el reporte. Error detallado:\n{str(e)}"
-            messagebox.showerror("Error", error_msg)
-            print(f"Error completo: {repr(e)}")
-
-    def generar_reporte_libros_no_prestados(self):
-        try:
-            cursor = self.db_connection.serverdb.cursor()
-            cursor.execute("""
-                SELECT l.libro_id, l.titulo, a.nombre_autor
-                FROM libro l
-                JOIN autor a ON l.autor_id = a.autor_id
-                LEFT JOIN detalle_prestamo dp ON l.libro_id = dp.libro_id
-                WHERE dp.detalle_prestamo_id IS NULL
-            """)
-            self.mostrar_resultados_reporte(cursor, "Libros nunca prestados")
-        except Exception as e:
-            messagebox.showerror("Error", f"No se pudo generar el reporte: {str(e)}")
-
-    def mostrar_resultados_reporte(self, cursor, titulo):
-        # Limpiar ventana
-        for widget in self.root.winfo_children():
-            widget.destroy()
-
-        tk.Label(self.root, text=titulo, font=("Arial", 16)).pack(pady=10)
-
-        # Obtener nombres de columnas
-        columns = [column[0] for column in cursor.description]
-
-        # Crear Treeview con estilo mejorado
-        style = ttk.Style()
-        style.configure("mystyle.Treeview", font=('Arial', 10))
-        style.configure("mystyle.Treeview.Heading", font=('Arial', 11, 'bold'))
-
-        tree = ttk.Treeview(self.root, columns=columns, show="headings", style="mystyle.Treeview")
-
-        for col in columns:
-            tree.heading(col, text=col)
-            tree.column(col, width=120, anchor="center")
-
-        tree.pack(fill="both", expand=True, pady=10)
-
-        for row in cursor.fetchall():
-            formatted_row = []
-            for value in row:
-                if isinstance(value, datetime):
-                    formatted_value = value.strftime("%Y-%m-%d")
-                elif isinstance(value, str):
-                    formatted_value = value.replace("'", "").replace('"', '')
-                else:
-                    formatted_value = str(value)
-                formatted_row.append(formatted_value)
-
-            tree.insert("", "end", values=formatted_row)
-
-        tk.Button(
-            self.root,
-            text="Volver",
-            command=self.create_main_menu,
-            bg="#2196F3",
-            fg="white",
-            font=("Arial", 10)
-        ).pack(pady=10)
 
     def get_options_from_table(self, table_name, column_name):
         cursor = self.db_connection.serverdb.cursor()
