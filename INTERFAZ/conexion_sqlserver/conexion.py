@@ -9,7 +9,7 @@ class Conexiones:
     current_role: str = None
 
     def conectar_sqlserver(self, username: str, password: str, rol: str):
-        server = 'AGUSTIN'
+        server = 'LENOVO1023'
         database = 'BibliotecaUniversitaria'
         
         try:
