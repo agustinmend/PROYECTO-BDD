@@ -1,3 +1,4 @@
+use[BibliotecaUniversitaria]
 CREATE LOGIN login_dba WITH PASSWORD = 'dba123';
 CREATE LOGIN login_gerente WITH PASSWORD = 'gerente123';
 CREATE LOGIN login_vendedor WITH PASSWORD = 'vendedor123';
@@ -22,8 +23,12 @@ GRANT SELECT, INSERT, UPDATE ON prestamo TO usuario_vendedor;
 GRANT SELECT, INSERT, UPDATE ON detalle_prestamo TO usuario_vendedor;
 GRANT SELECT, INSERT, UPDATE ON libro_autor TO usuario_vendedor;
 GRANT SELECT, INSERT, UPDATE ON usuario TO usuario_vendedor;
+--dar permiso a vendedor para que ejecute sp
+GRANT EXECUTE ON dbo.ObtenerLibrosPorAutor TO usuario_vendedor;
+GRANT EXECUTE ON dbo.ObtenerPrestamosActivosPorNombre TO usuario_vendedor;
+GRANT EXECUTE ON dbo.DevolverLibro TO usuario_vendedor;
 
-SELECT name FROM sys.server_principals WHERE type = 'S';
+SELECT name FROM sys.server_principals WHERE type = 'S';	
 
 create view libros_mas_prestados as
 select top 10 l.libro_id , l.titulo , c.nombre_categoria , tp.nombre_tipo ,l.editorial , sum(dp.cantidad) as prestamos

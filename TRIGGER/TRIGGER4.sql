@@ -1,6 +1,7 @@
---TRIGGER PARA ACTUALIZAR EL STOCK LUEGO DE DEVOLVER
+use [BibliotecaUniversitaria]
+--TRIGGER PARA ACTUALIZAR EL STOCK LUEGO DE DEVOLVER Y PONER LA FECHA DE HOY EN FECHA_DEVOLUCION
 
-CREATE TRIGGER actualizar_stock2
+ALTER TRIGGER actualizar_stock2
 ON prestamo
 AFTER UPDATE
 AS
@@ -16,6 +17,12 @@ BEGIN
         FROM libro l
         INNER JOIN detalle_prestamo dp ON dp.libro_id = l.libro_id
         INNER JOIN inserted i ON i.prestamo_id = dp.prestamo_id
+        WHERE i.estado = 'devuelto';
+
+		UPDATE p
+        SET p.fecha_devolucion = GETDATE()
+        FROM prestamo p
+        INNER JOIN inserted i ON i.prestamo_id = p.prestamo_id
         WHERE i.estado = 'devuelto';
     END
 END;
