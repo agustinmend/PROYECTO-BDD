@@ -81,6 +81,48 @@ class BibliotecaApp:
                 command=lambda t=table_name, c=columns: self.create_action_interface(action, t, c, c[0])
             ).pack(pady=5)
 
+        ##bloque para anadir boton ver libros disponibles
+        tk.Button(
+            self.root,
+            text="📚 Ver Libros Disponibles",
+            width=30,
+            bg="#2196F3",
+            fg="white",
+            font=("Arial", 11),
+            command=self.mostrar_libros_disponibles
+        ).pack(pady=10)
+        ##bloque para ver prestamos activos
+        tk.Button(
+            self.root,
+            text="📄 Ver Préstamos Activos",
+            width=30,
+            bg="#009688",
+            fg="white",
+            font=("Arial", 11),
+            command=self.mostrar_prestamos_activos
+        ).pack(pady=10)
+        ##bloque para libros por autor
+        tk.Button(
+            self.root,
+            text="🔎 Buscar libros por autor",
+            width=30,
+            bg="#673AB7",
+            fg="white",
+            font=("Arial", 11),
+            command=self.buscar_libros_por_autor
+        ).pack(pady=10)
+        ##bloque para devolver
+        tk.Button(
+            self.root,
+            text="🔁 Devolver libro por nombre",
+            width=30,
+            bg="#009688",
+            fg="white",
+            font=("Arial", 11),
+            command=self.buscar_y_devolver_por_nombre
+        ).pack(pady=10)
+
+
         back_button = tk.Button(self.root, text="Volver", command=self.create_main_menu)
         back_button.pack(pady=10)
 
@@ -221,7 +263,227 @@ class BibliotecaApp:
                 command=self.create_main_menu,
                 bg="#2196F3",
                 fg="white").pack(pady=10)
+# Obtener libros_disponibles by Agustin
+    def obtener_libros_disponibles(self):
+        cursor = self.db_connection.serverdb.cursor()
+        
+        cursor.execute("SELECT titulo, nombre_categoria , nombre_tipo, editorial, copias_totales FROM Libros_disponibles")
+        columnas = [column[0] for column in cursor.description]
+        resultados = cursor.fetchall()
 
+        libros = []
+        for fila in resultados:
+            libro = dict(zip(columnas, fila))
+            libros.append(libro)
+        
+        cursor.close()
+        return libros
+    
+    def mostrar_libros_disponibles(self):
+        for widget in self.root.winfo_children():
+            widget.destroy()
+        libros = self.obtener_libros_disponibles()
+        tk.Label(self.root, text="📚 Libros Disponibles", font=("Arial", 14, "bold")).pack(pady=20)
+        if not libros:
+            tk.Label(self.root, text="No hay libros disponibles.", font=("Arial", 11)).pack(pady=10)
+        else:
+            columnas = ["titulo", "nombre_categoria", "nombre_tipo", "editorial", "copias_totales"]
+            tree = ttk.Treeview(self.root, columns=columnas, show='headings', height=15)
+            tree.pack(pady=10, padx=10)
+            tree.heading("titulo", text="Título")
+            tree.heading("nombre_categoria", text="Categoría")
+            tree.heading("nombre_tipo", text="Tipo")
+            tree.heading("editorial", text="Editorial")
+            tree.heading("copias_totales", text="Copias Totales")
+            for col in columnas:
+                tree.column(col, width=150)
+            for libro in libros:
+                tree.insert("", "end", values=(
+                    libro["titulo"],
+                    libro["nombre_categoria"],
+                    libro["nombre_tipo"],
+                    libro["editorial"],
+                    libro["copias_totales"]
+                ))
+        tk.Button(self.root, text="Volver", command=self.create_main_menu).pack(pady=20)
+# hasta aca
+#ver prestamos activos
+    def obtener_prestamos_activos(self):
+        cursor = self.db_connection.serverdb.cursor()
+        
+        cursor.execute("SELECT * FROM prestamos_activos")
+        columnas = [col[0] for col in cursor.description]
+        resultados = cursor.fetchall()
+
+        prestamos = []
+        for fila in resultados:
+            prestamos.append(dict(zip(columnas, fila)))
+
+        cursor.close()
+        return prestamos
+    
+    def mostrar_prestamos_activos(self):
+        for widget in self.root.winfo_children():
+            widget.destroy()
+        tk.Label(self.root, text="📄 Préstamos Activos", font=("Arial", 14, "bold")).pack(pady=20)
+        prestamos = self.obtener_prestamos_activos()
+        if not prestamos:
+            tk.Label(self.root, text="No hay préstamos activos.", font=("Arial", 11)).pack(pady=10)
+            return
+        columnas = list(prestamos[0].keys())
+        tree = ttk.Treeview(self.root, columns=columnas, show='headings', height=15)
+        tree.pack(pady=10)
+        for col in columnas:
+            tree.heading(col, text=col.replace("_", " ").capitalize())
+            tree.column(col, width=130)
+        for prestamo in prestamos:
+            valores = [prestamo[col] for col in columnas]
+            tree.insert("", "end", values=valores)
+        tk.Button(self.root, text="Volver", command=self.create_main_menu).pack(pady=20)
+# hasta aca
+#libros por autor
+    def obtener_libros_por_autor(self, nombre_autor):
+        cursor = self.db_connection.serverdb.cursor()
+
+        cursor.execute("exec ObtenerLibrosPorAutor ?", (nombre_autor,))
+        
+        columnas = [col[0] for col in cursor.description]
+        resultados = cursor.fetchall()
+
+        libros = []
+        for fila in resultados:
+            libros.append(dict(zip(columnas, fila)))
+
+        cursor.close()
+        return libros
+        
+
+    def buscar_libros_por_autor(self):
+        for widget in self.root.winfo_children():
+            widget.destroy()
+        tk.Label(self.root, text="🔍 Buscar libros por autor", font=("Arial", 14, "bold")).pack(pady=20)
+        entry_var = tk.StringVar()
+        tk.Entry(self.root, textvariable=entry_var, font=("Arial", 12), width=40).pack(pady=10)
+        def realizar_busqueda():
+            autor = entry_var.get()
+            if not autor:
+                messagebox.showwarning("Campo vacío", "Por favor ingrese un nombre de autor.")
+                return
+            libros = self.obtener_libros_por_autor(autor)
+            for widget in self.root.pack_slaves():
+                if isinstance(widget, ttk.Treeview):
+                    widget.destroy()
+            if not libros:
+                tk.Label(self.root, text="No se encontraron libros para ese autor.", font=("Arial", 11)).pack(pady=10)
+                return
+            columnas = list(libros[0].keys())
+            tree = ttk.Treeview(self.root, columns=columnas, show='headings', height=15)
+            tree.pack(pady=10)
+            for col in columnas:
+                tree.heading(col, text=col.replace("_", " ").capitalize())
+                tree.column(col, width=140)
+            for libro in libros:
+                tree.insert("", "end", values=[libro[col] for col in columnas])
+        tk.Button(
+            self.root,
+            text="Buscar",
+            command=realizar_busqueda,
+            bg="#4CAF50",
+            fg="white",
+            font=("Arial", 11)
+        ).pack(pady=10)
+
+        tk.Button(
+            self.root,
+            text="Volver",
+            command=self.create_main_menu,
+            font=("Arial", 11)
+        ).pack(pady=20)
+#hasta aca
+#hacer devolucion
+    def obtener_prestamos_por_nombre(self, nombre):
+        cursor = self.db_connection.serverdb.cursor()
+        cursor.execute("EXEC ObtenerPrestamosActivosPorNombre ?", (nombre,))
+        columnas = [col[0] for col in cursor.description]
+        prestamos = [dict(zip(columnas, fila)) for fila in cursor.fetchall()]
+        cursor.close()
+        return prestamos
+    def buscar_y_devolver_por_nombre(self):
+        for widget in self.root.winfo_children():
+            widget.destroy()
+
+        tk.Label(self.root, text="🔍 Buscar préstamos activos por nombre", font=("Arial", 14, "bold")).pack(pady=20)
+
+        entry_var = tk.StringVar()
+        tk.Entry(self.root, textvariable=entry_var, font=("Arial", 12), width=40).pack(pady=10)
+
+        def realizar_busqueda():
+            nombre = entry_var.get()
+            if not nombre:
+                messagebox.showwarning("Campo vacío", "Por favor ingrese un nombre.")
+                return
+
+            prestamos = self.obtener_prestamos_por_nombre(nombre)
+
+            # Eliminar resultados anteriores
+            for widget in self.root.pack_slaves():
+                if isinstance(widget, ttk.Treeview):
+                    widget.destroy()
+
+            if not prestamos:
+                tk.Label(self.root, text="No se encontraron préstamos activos para ese nombre.", font=("Arial", 11)).pack(pady=10)
+                return
+
+            columnas = list(prestamos[0].keys())
+
+            tree = ttk.Treeview(self.root, columns=columnas, show='headings', height=15)
+            tree.pack(pady=10)
+
+            for col in columnas:
+                tree.heading(col, text=col.replace("_", " ").capitalize())
+                tree.column(col, width=140)
+
+            for p in prestamos:
+                tree.insert("", "end", values=[p[col] for col in columnas])
+
+            def seleccionar_y_devolver():
+                selected_item = tree.focus()
+                if not selected_item:
+                    messagebox.showwarning("Atención", "Seleccioná un préstamo para devolver.")
+                    return
+
+                datos = tree.item(selected_item)['values']
+                id_prestamo = datos[0]  # primer columna debe ser id_prestamo
+
+                confirmar = messagebox.askyesno("Confirmar devolución", f"¿Devolver préstamo ID {id_prestamo}?")
+                if confirmar:
+                    self.devolver_libro(id_prestamo)
+                    realizar_busqueda()  # Recargar tabla
+
+            tk.Button(
+                self.root,
+                text="Devolver préstamo seleccionado",
+                command=seleccionar_y_devolver,
+                bg="#FF5722",
+                fg="white",
+                font=("Arial", 11)
+            ).pack(pady=10)
+
+        tk.Button(self.root, text="Buscar", command=realizar_busqueda, bg="#4CAF50", fg="white", font=("Arial", 11)).pack(pady=10)
+        tk.Button(self.root, text="Volver", command=self.create_main_menu).pack(pady=20)
+
+    def devolver_libro(self, id_prestamo):
+        cursor = self.db_connection.serverdb.cursor()
+        try:
+            cursor.execute("EXEC DevolverLibro ?", (id_prestamo,))  # <--- Acá actualizás el estado
+            self.db_connection.serverdb.commit()
+            messagebox.showinfo("Éxito", "Libro devuelto correctamente.")
+        except Exception as e:
+            messagebox.showerror("Error", f"No se pudo devolver el libro:\n{str(e)}")
+        finally:
+            cursor.close()
+
+#hasta aca
     def volver_al_login(self):
         """Cierra la sesión actual y vuelve al login"""
         self.root.destroy()
