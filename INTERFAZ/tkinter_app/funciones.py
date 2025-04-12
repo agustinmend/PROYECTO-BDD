@@ -1,7 +1,8 @@
 from tkinter import messagebox
 from datetime import datetime
 
-def fetch_data(db_connection, tree, table_name):
+def fetch_data(db_connection, tree, table_name, columns=None):
+    """Función mejorada para obtener datos con columnas específicas"""
     conn = db_connection.serverdb
     if not conn:
         messagebox.showerror("Error", "No hay conexión a la base de datos")
@@ -9,8 +10,20 @@ def fetch_data(db_connection, tree, table_name):
 
     cursor = conn.cursor()
     try:
-        cursor.execute(f"SELECT * FROM {table_name}")
+        # Si no se especifican columnas, usa todas
+        if columns is None:
+            cursor.execute(f"SELECT * FROM {table_name}")
+        else:
+            cursor.execute(f"SELECT {', '.join(columns)} FROM {table_name}")
+            
         rows = cursor.fetchall()
+
+        # Configurar treeview si no está configurado
+        if not tree['columns']:
+            tree['columns'] = columns if columns else [desc[0] for desc in cursor.description]
+            for col in tree['columns']:
+                tree.heading(col, text=col.capitalize().replace('_', ' '))
+                tree.column(col, width=120, anchor="center")
 
         tree.delete(*tree.get_children())
 
@@ -165,3 +178,4 @@ def update_data(db_connection, tree, table_name, columns, values, record_id):
         fetch_data(db_connection, tree, table_name)
     except Exception as e:
         messagebox.showerror("Error", f"No se pudo actualizar el registro de {table_name}: {e}")
+

@@ -118,3 +118,28 @@ class Pol:
             fg="white",
             font=("Arial", 10)
         ).pack(pady=10)
+    
+    def generar_reporte_prestamos_vencidos(self, db_connection):
+        """Genera reporte de préstamos vencidos"""
+        try:
+            cursor = db_connection.serverdb.cursor()
+            cursor.execute("""
+                SELECT 
+                    p.prestamo_id,
+                    u.correo AS usuario,
+                    l.titulo AS libro,
+                    p.fecha_prestamo,
+                    p.fecha_limite_devolucion,
+                    DATEDIFF(day, p.fecha_limite_devolucion, GETDATE()) AS dias_vencido
+                FROM prestamo p
+                JOIN usuario u ON p.usuario_id = u.usuario_id
+                JOIN detalle_prestamo dp ON p.prestamo_id = dp.prestamo_id
+                JOIN libro l ON dp.libro_id = l.libro_id
+                WHERE p.estado = 'Activo'
+                AND p.fecha_limite_devolucion < GETDATE()
+                ORDER BY dias_vencido DESC
+            """)
+            return cursor
+        except Exception as e:
+            messagebox.showerror("Error", f"No se pudo generar el reporte: {str(e)}")
+            return None

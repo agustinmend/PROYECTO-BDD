@@ -2,7 +2,7 @@
 --FECHA: 11-04-2025
 --DESCRIPCION: DEVUELVE UN LIBRO PRESTADO
 
-create procedure DevolverLibro
+alter procedure DevolverLibro
 	@prestamo_id INT
 as
 begin
