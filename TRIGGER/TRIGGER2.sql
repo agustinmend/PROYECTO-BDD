@@ -19,6 +19,7 @@ BEGIN
 END;
 
 SELECT * FROM PRESTAMO
-insert into prestamo(usuario_id, fecha_prestamo,bibliotecario_id)VALUES(50,'2025-03-01',1)
-SELECT * FROM prestamo
+INSERT INTO prestamo (usuario_id, fecha_prestamo, bibliotecario_id)
+VALUES (58, '2025-04-11', 2); 
+SELECT * FROM prestamo 
 

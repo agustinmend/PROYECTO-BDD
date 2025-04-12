@@ -19,6 +19,7 @@ GROUP BY
     p.fecha_prestamo,
 	p.fecha_limite_devolucion;
 
+SELECT * FROM mostrar_usuarios_con_prestamo_activo
 CREATE VIEW usuarios_con_mas_prestamos AS
 SELECT 
     u.usuario_id, 
@@ -31,6 +32,8 @@ LEFT JOIN detalle_prestamo dp ON dp.prestamo_id = p.prestamo_id
 GROUP BY u.usuario_id, CONCAT(u.nombre, ' ', u.apellido)
 HAVING SUM(dp.cantidad) IS NOT NULL;
 
+SELECT * FROM usuarios_con_mas_prestamos
+
 CREATE VIEW libros_por_categoria AS
 SELECT 
     c.nombre_categoria,
@@ -40,7 +43,4 @@ FROM libro l
 LEFT JOIN categoria c ON c.categoria_id = l.categoria_id
 GROUP BY c.nombre_categoria;
 
-
-SELECT * 
-                FROM libros_por_categoria
-                ORDER BY total_stock DESC;
+SELECT * FROM libros_por_categoria

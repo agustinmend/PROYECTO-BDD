@@ -26,6 +26,12 @@ EXEC Registrar_Libro
 EXEC Reporte_Mes @fecha = '2024-02-15';
 exec Historial_pedidos_cliente @clienteid = 2
 
+EXEC ObtenerPrestamosActivosPorNombre @Nombre = 'Carmen';
+
+EXEC ObtenerLibrosPorAutor @nombre = 'John';
+
+EXEC DevolverLibro @prestamo_id = 25;
+
 select *
 from prestamo
 

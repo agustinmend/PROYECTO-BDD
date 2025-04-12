@@ -2,14 +2,20 @@
 --FECHA: 11-04-2025
 --DESCRIPCION: DEVUELVE UN LIBRO PRESTADO
 
-alter procedure DevolverLibro
-	@prestamo_id INT
-as
-begin
-	update prestamo
-	set estado = 'Devuelto'
-	where prestamo_id = @prestamo_id
-end
+--AUTOR: ARIANY LOPEZ
+--FECHA: 11-04-2025
+--DESCRIPCION: MODIFICACION CON FECHA DEVOLUCION 
+
+ALTER PROCEDURE DevolverLibro
+    @prestamo_id INT
+AS
+BEGIN
+    UPDATE prestamo
+    SET estado = 'Devuelto',
+        fecha_devolucion = GETDATE()
+    WHERE prestamo_id = @prestamo_id
+END;
+
 
 select *
 from prestamo

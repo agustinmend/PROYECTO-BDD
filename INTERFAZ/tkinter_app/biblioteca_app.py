@@ -749,7 +749,7 @@ class BibliotecaApp:
         tk.Button(self.root, text="Volver", command=self._create_dba_interface, bg="#2196F3", fg="white", font=("Arial", 11)).pack(pady=20)
 
     def _create_dba_interface(self, parent_frame=None):
-        """Interfaz COMPLETA para DBAs con corrección de error de parent_frame"""
+        """Interfaz COMPLETA para DBAs"""
         container = parent_frame if parent_frame else self.root
         for widget in container.winfo_children():
             widget.destroy()
@@ -775,8 +775,7 @@ class BibliotecaApp:
             ("➕ Agregar Registros", lambda: self._show_tables('agregar')),
             ("✏️ Modificar Registros", lambda: self._show_tables('modificar')),
             ("🗑️ Eliminar Registros", lambda: self._show_tables('eliminar')),
-            ("📊 Reportes Gerenciales", self._show_reports),
-            ("🔙 Volver al Menú", self.create_main_menu)
+            ("📊 Reportes Gerenciales", self._show_reports)
         ]
 
         for text, action in actions:
@@ -790,6 +789,13 @@ class BibliotecaApp:
                           font=("Arial", 11),
                           command=action)
             btn.pack(pady=5)
+        tk.Button(parent_frame,
+                text="🔒 Cerrar Sesión",
+                command=self.volver_al_login,
+                bg="#FF5722",
+                fg="white",
+                font=("Arial", 11),
+                width=25).pack(pady=10)
 
     def _show_tables(self, action='visualizar'):
         """Muestra lista de tablas para seleccionar"""
