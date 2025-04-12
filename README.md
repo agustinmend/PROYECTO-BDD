@@ -1,5 +1,17 @@
 # Sistema de Gestión de Biblioteca Universitaria
-Documentacion del Proyecto: https://docs.google.com/document/d/1badtp8cm4XjZkvnguIqoesS3zT_rXq2XExLZC_pL1Z8/edit?usp=sharing 
+Documentacion del Proyecto: https://docs.google.com/document/d/1badtp8cm4XjZkvnguIqoesS3zT_rXq2XExLZC_pL1Z8/edit?usp=sharing
+## Credenciales de los Roles:
+
+### Rol Vendedor: 
+*Usuario*: login_vendedor
+*Contraseña*: vendedor123
+### Rol Gerente: 
+*Usuario*: login_gerente
+*Contraseña*: gerente123
+### Rol DBA: 
+*Usuario*: login_dba
+*Contraseña*: dba123
+
 ## Descripción
 Sistema completo para la gestión de bibliotecas universitarias con:
 
